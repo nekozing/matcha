@@ -16,15 +16,19 @@ class RandomGraph(Graph):
         if p < 0 or p > 1:
             raise ValueError("p is a probability which range is [0, 1]")
         verticies = self.vertices()
-        unvisitedVertices = set(verticies)
-        for vertexA in vertices:
-            for vertexB in self[vertexA]:
+        visitedVerticies = set()
+        for vertexA in verticies:
+            visitedVerticies.add(vertexA)
+            for vertexB in verticies:
                 if vertexB == vertexA:
                     continue
-                if vertexB not in unvisitedVertices:
+                if vertexB in visitedVerticies:
                     continue
                 if random.random() <= p:
-                    self.add_edge(Edge(vertexA, vertexB))
+                    edge = Edge(vertexA, vertexB)
+                    self.add_edge(edge)
+                    print(edge)
+
 
 
 
