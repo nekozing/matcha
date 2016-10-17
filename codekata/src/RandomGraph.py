@@ -3,6 +3,7 @@ from Graph import Edge
 from Graph import Graph
 import unittest
 import random
+import string
 """
 define a class named RandomGraph that inherits from Graph and provides a method 
 named add_random_edges that takes a probability p as a parameter and, 
@@ -27,10 +28,6 @@ class RandomGraph(Graph):
                 if random.random() <= p:
                     edge = Edge(vertexA, vertexB)
                     self.add_edge(edge)
-                    print(edge)
-
-
-
 
 
 class RandomGraphTest(unittest.TestCase):
@@ -42,6 +39,20 @@ class RandomGraphTest(unittest.TestCase):
         w = Vertex('w')
         e = Edge(v, w)
         g = RandomGraph([v, w], [e])
+
+    def test_erdos(self):
+        n = 50
+        p = 0.15
+        labels = string.ascii_lowercase + string.ascii_uppercase
+        
+        connected_count = 0.0
+        experiment_count = 100
+        for i in range(experiment_count):
+            vs = [Vertex(c) for c in labels[:n]]
+            g = RandomGraph(vs)
+            g.add_random_edges(p)
+            if g.is_connected(): connected_count += 1
+        print "random graph of {:d} vertices and p {:.2f} has {:.2f} of being connected".format(n, p, connected_count/experiment_count) 
 
 if __name__ == '__main__':
     unittest.main()
