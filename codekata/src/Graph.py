@@ -7,6 +7,7 @@ Copyright 2011 Allen B. Downey.
 Distributed under the GNU General Public License at gnu.org/licenses/gpl.html.
 """
 import unittest
+import Queue
 
 class Vertex(object):
     """A Vertex is a node in a graph."""
@@ -117,26 +118,49 @@ class Graph(dict):
                     continue
                 self.add_edge(Edge(vertexA, vertexB))
 
+    def is_connected(self):
+        """returns True if the Graph is connected and False otherwise"""
+        marked = set()
+        toVisitQueue = Queue.Queue()
+        # pick any as root
+        toVisitQueue.put(next(iter(self.keys())))
+
+        while not toVisitQueue.empty():
+            currentVertix = toVisitQueue.get()
+            marked.add(currentVertix)
+            for connectedVertix in self[currentVertix]:
+                if connectedVertix in marked: continue
+                toVisitQueue.put(connectedVertix)
+
+        # if connected then marked = self.keys()
+        return marked == set(self.keys())
+
 class GraphCodeTest(unittest.TestCase):
     def setUp(self):
         self.data = data = type('test', (object,), {})()
+        u = data.u = Vertex('u')
         v = data.v = Vertex('v')
         w = data.w = Vertex('w')
-        e = data.e = Edge(v, w)
-        data.g = Graph([v,w], [e])
+        e1 = data.e1 = Edge(v, w)
+        e2 = data.e2 = Edge(u, w)
+        e3 = data.e3 = Edge(u, v)
+        data.g = Graph([u,v,w], [e1, e2, e3])
 
     def testEdges(self):
         data = self.data
-        self.assertEqual([data.e], data.g.edges())
+        self.assertEqual(set([data.e1, data.e2, data.e3]), set(data.g.edges()))
 
     def testOutVertices(self):
         data = self.data
-        self.assertEqual(data.g.out_vertices(data.v), [data.w])
+        self.assertEqual(set(data.g.out_vertices(data.u)), set([data.v, data.w]))
 
     def testOutEdges(self):
         data = self.data
-        self.assertEqual(data.g.out_edges(data.v), [data.e])
+        self.assertEqual(set(data.g.out_edges(data.v)), set([data.e1, data.e3]))
 
+    def testIsConnected(self):
+        data = self.data
+        self.assertTrue(data.g.is_connected())
 
 def main(script, *args):
     v = Vertex('v')
